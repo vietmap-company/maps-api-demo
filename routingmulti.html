@@ -105,14 +105,14 @@ li.active{
 <script>
 var map = L.map('map').setView([10.758810, 106.681450], 14);
 
-L.tileLayer('http://maps.vietmap.vn/tm/{z}/{x}/{y}.png?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46', {
+L.tileLayer('https://maps.vietmap.vn/tm/{z}/{x}/{y}.png?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46', {
     attribution: '&copy; <a href="http://maps.vietmap.vn/copyright">Vietmap</a> contributors'
 }).addTo(map);
 
 $(document).ready(function(){
 $.ajax({
 
-url:'http://maps.vietmap.vn/api/route?point=10.765963,106.647366&point=10.762927,106.651046&point=10.759144,106.651411&point=10.758258,106.660445&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46',
+url:'https://maps.vietmap.vn/api/route?point=10.765963,106.647366&point=10.762927,106.651046&point=10.759144,106.651411&point=10.758258,106.660445&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46',
 type:'get',
 success:function(res){
 var colors=['green','red','blue','green','yellow','orange'];

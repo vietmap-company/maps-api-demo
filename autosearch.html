@@ -186,7 +186,7 @@ li.active{
 var map = L.map('map').setView([10.758810, 106.681450], 14);
 var marker=null;
 var reverseMarker=null;
-L.tileLayer('http://maps.vietmap.vn/tm/{z}/{x}/{y}.png?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46', {
+L.tileLayer('https://maps.vietmap.vn/tm/{z}/{x}/{y}.png?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46', {
     attribution: '&copy; <a href="http://maps.vietmap.vn/copyright">Vietmap</a> contributors'
 }).addTo(map);
 
@@ -194,7 +194,7 @@ $(document).ready(function(){
 map.on('click',function(el){
 //console.log(el);
 $.ajax({
-url:'http://maps.vietmap.vn/api/reverse?size=10&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&point.lat='+el.latlng.lat+'&point.lon='+el.latlng.lng,
+url:'https://maps.vietmap.vn/api/reverse?size=10&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&point.lat='+el.latlng.lat+'&point.lon='+el.latlng.lng,
 type:'get',
 success:function(res){
   if(res.data.length==0) return;
@@ -223,7 +223,7 @@ if(reverseMarker!=null)
         source: function(term, response) {
 		var latlon=map.getCenter();
 		
-          fetch('http://maps.vietmap.vn/api/autocomplete?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&focus.point.lat='+latlon.lat+'&focus.point.lon='+latlon.lng+'&text=' + term)
+          fetch('https://maps.vietmap.vn/api/autocomplete?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&focus.point.lat='+latlon.lat+'&focus.point.lon='+latlon.lng+'&text=' + term)
             .then(function(response) {
               return response.text();
             }).then(function(body) {
