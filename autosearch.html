@@ -194,7 +194,7 @@ $(document).ready(function(){
 map.on('click',function(el){
 //console.log(el);
 $.ajax({
-url:'https://maps.vietmap.vn/api/reverse?size=10&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&point.lat='+el.latlng.lat+'&point.lon='+el.latlng.lng,
+url:'https://maps.vietmap.vn/api/reverse?size=10&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&lat='+el.latlng.lat+'&lon='+el.latlng.lng,
 type:'get',
 success:function(res){
   if(res.data.length==0) return;
@@ -209,7 +209,7 @@ if(reverseMarker!=null)
 			 popupAnchor: [0, -20]
 			});
 			reverseMarker= L.marker([el.latlng.lat,el.latlng.lng],{icon:startIcon});
-			reverseMarker.bindPopup('<p>'+res.features[0].properties.label+'</p>');
+			reverseMarker.bindPopup('<p>'+res.data[0].properties.label+'</p>');
 			reverseMarker.addTo(map);
 			reverseMarker.openPopup();
 }
