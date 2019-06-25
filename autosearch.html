@@ -1,0 +1,302 @@
+<html>
+<head>
+<title>
+Demo Map Api-Vietmap
+</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+    <link rel="stylesheet" href="auto-complete.css">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+   integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+   crossorigin=""></script>
+    <script src="auto-complete.js"></script>
+<style>
+body{
+margin:0;
+padding:0;
+overflow:hidden;
+}
+.top{
+position:absolute;
+height:50px;
+left:0;
+right:0;
+background:gray;
+}
+.center{
+position:absolute;
+right:0;
+left:0;
+top:50px;
+bottom:0
+}
+
+#map{
+width:100%;
+height:100%;
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+li.nav {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 13px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111111;
+}
+#left-menu{
+height:100%;
+overflow-y:scroll;
+overflow-x:hidden;
+}
+
+#left-menu > .title{
+margin-bottom:15px;
+}
+
+#left-menu h2,h3,h4{
+padding-left:15px;
+}
+
+li.list-item{
+border-top: dashed 1px darkblue;
+padding-left:15px;
+}
+
+li.list-item p{
+margin-bottom: 5px !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font: 16px Arial;  
+}
+
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+  cursor: pointer;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+
+.search-form{
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+    margin: 30px 0;
+    padding: 5px 2px;
+    text-align: center;
+    z-index: 1000;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    width: 350px;
+}
+li.active{
+    background-color: darkgreen;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="top">
+<ul>
+<li class="nav"><a href="tilemap.html">Bản đồ nền</a></li>
+<li class="nav"><a href="routing.html">Dẫn đường qua 2 điểm</a></li>
+<li class="nav"><a href="routingmulti.html">Dẫn đường qua nhiều điểm</a></li>
+<li class="nav active"><a href="autosearch.html">Auto Search</a></li>
+</ul>
+</div>
+<div class="center row">
+
+<div id="map">
+<form class="search-form" onsubmit="return false;">
+        <input id="places-search" autofocus type="text" name="q" placeholder="Nhập tên hoặc địa chỉ để tìm kiếm ..." style="width:100%;max-width:600px;outline:0">
+</form>
+</div>
+</div>
+<script>
+var map = L.map('map').setView([10.758810, 106.681450], 14);
+var marker=null;
+var reverseMarker=null;
+L.tileLayer('http://maps.vietmap.vn/tm/{z}/{x}/{y}.png?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46', {
+    attribution: '&copy; <a href="http://maps.vietmap.vn/copyright">Vietmap</a> contributors'
+}).addTo(map);
+
+$(document).ready(function(){
+map.on('click',function(el){
+//console.log(el);
+$.ajax({
+url:'http://maps.vietmap.vn/api/reverse?size=10&apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&point.lat='+el.latlng.lat+'&point.lon='+el.latlng.lng,
+type:'get',
+success:function(res){
+  if(res.data.length==0) return;
+if(reverseMarker!=null)
+{
+	map.removeLayer(reverseMarker);
+}
+
+			var startIcon = L.icon({
+			iconUrl: 'pink.png',
+			iconAnchor: [32, 32],
+			 popupAnchor: [0, -20]
+			});
+			reverseMarker= L.marker([el.latlng.lat,el.latlng.lng],{icon:startIcon});
+			reverseMarker.bindPopup('<p>'+res.features[0].properties.label+'</p>');
+			reverseMarker.addTo(map);
+			reverseMarker.openPopup();
+}
+})
+})
+})
+
+      var demo_with_map = new autoComplete({
+        selector: '#places-search',
+        minChars: 2,
+        source: function(term, response) {
+		var latlon=map.getCenter();
+		
+          fetch('http://maps.vietmap.vn/api/autocomplete?apikey=9cbf0bc15d3901b7e043d8f76be8d73f370a82fe629a2d46&focus.point.lat='+latlon.lat+'&focus.point.lon='+latlon.lng+'&text=' + term)
+            .then(function(response) {
+              return response.text();
+            }).then(function(body) {
+              var json = JSON.parse(body);
+			  
+			  var data=[];
+			  for(var i=0;i<json.data.length;i++){
+				data.push({nom:json.data[i].properties.label,code:json.data[i].properties.name,centre:{coordinates:json.data[i].geometry.coordinates} });
+			  }
+			  
+              var new_json = data.map(function(el) {
+                
+                return {
+                  label: el.nom,
+                  value: el.code,
+                  lat: el.centre.coordinates[1],
+                  lon: el.centre.coordinates[0],
+                  boundingbox: null
+                }
+              })
+              response(new_json);
+            });
+        },
+        renderItem: function(item, search) {
+          search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+          var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+          var optional_bbox_attribute = '';
+          if (item.boundingbox) {
+            var bbox = [item.boundingbox[2], item.boundingbox[0], item.boundingbox[3], item.boundingbox[1]];
+            var optional_bbox_attribute = 'data-bbox="' + bbox.join(',') + '" ';
+          }
+          return '<div class="autocomplete-suggestion" ' + optional_bbox_attribute +
+            'data-lon="' + item.lon + '" data-lat="' + item.lat +
+            '" data-val="' + item.label + '">' +
+            item.label.replace(re, "<b>$1</b>") +
+            '</div>';
+        },
+        onSelect: function(e, term, item) {
+          if (item.getAttribute('data-bbox') && (item.getAttribute('data-bbox').split(',')).length > 0) {
+            var extent = item.getAttribute('data-bbox').split(',');
+            if (extent.length > 0) {
+              extent = extent.map(function(el) {
+                return Number(el);
+              });
+            }
+            var bounds = [[extent[1], extent[0]], [extent[3], extent[2]]];
+
+            // zoom the map to the bounds
+            map.fitBounds(bounds);
+          } else {
+            var lat = Number(item.getAttribute('data-lat'));
+            var lon = Number(item.getAttribute('data-lon'));
+			
+            map.setView(L.latLng(lat, lon), map.getZoom());
+			
+			if(marker!=null){
+				map.removeLayer(marker);
+			}
+			
+			var startIcon = L.icon({
+			iconUrl: 'pin.png',
+			iconAnchor: [32, 32],
+			 popupAnchor: [15, -20]
+			});
+			marker= L.marker([lat,lon],{icon:startIcon});
+			marker.bindPopup('<p>'+term+'</p>');
+			marker.addTo(map);
+			marker.openPopup();
+          }
+        }
+      });
+
+</script>
+</body>
+</html>
+
